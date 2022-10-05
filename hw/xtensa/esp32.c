@@ -39,9 +39,14 @@
 #include "elf.h"
 
 #define TYPE_ESP32_SOC "xtensa.esp32"
+
+// HACK: For now, just use the larger flash chip by default
+#define ESP32_FLASH_CHIP "gd25q128"
+
 #define ESP32_SOC(obj) OBJECT_CHECK(Esp32SocState, (obj), TYPE_ESP32_SOC)
 
 #define TYPE_ESP32_CPU XTENSA_CPU_TYPE_NAME("esp32")
+
 
 
 
@@ -665,7 +670,7 @@ static void esp32_machine_init_spi_flash(Esp32SocState *ss, BlockBackend* blk)
     /* "main" flash chip is attached to SPI1, CS0 */
     DeviceState *spi_master = DEVICE(&ss->spi[1]);
     BusState* spi_bus = qdev_get_child_bus(spi_master, "spi");
-    DeviceState *flash_dev = qdev_new("gd25q32");
+    DeviceState *flash_dev = qdev_new(ESP32_FLASH_CHIP);
     qdev_prop_set_drive(flash_dev, "drive", blk);
     qdev_realize_and_unref(flash_dev, spi_bus, &error_fatal);
     qdev_connect_gpio_out_named(spi_master, SSI_GPIO_CS, 0,
